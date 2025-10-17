@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - PROD=info
+      - "8080:8080"
+    volumes:
+      - .:/usr/src/app
+      - cargo-cache:/usr/local/cargo/registry
+      - target-cache:/usr/src/app/target
+      - cargo-git:/usr/local/cargo/git
+
+volumes:
+  cargo-cache:
+  target-cache:
+  cargo-git:
