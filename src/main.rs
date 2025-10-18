@@ -8,6 +8,8 @@ use tracing::info;
 
 mod app;
 mod config;
+mod handlers;
+mod services;
 
 #[tokio::main]
 async fn main() {

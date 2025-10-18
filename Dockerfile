@@ -1,7 +1,7 @@
 # To test locally, use: docker buildx build --platform linux/arm64 -t peak_backend --load . && docker run -p 8080:8080 peak_backend
 
 # --- Builder stage ---
-FROM rust:1.81-slim AS builder
+FROM rust:slim AS builder
 WORKDIR /usr/src/app
 
 # Install build dependencies
@@ -15,8 +15,8 @@ COPY Cargo.toml Cargo.lock ./
 # Copy source
 COPY src ./src
 
-# Build release binary
-RUN cargo build --release
+# Build release binary with reproducible builds
+RUN cargo build --release --locked
 
 # --- Production stage ---
 FROM debian:bookworm-slim

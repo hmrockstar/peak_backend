@@ -5,6 +5,7 @@ use axum::{
 };
 use std::time::Duration;
 
+use crate::handlers::peaks::get_peaks;
 use tower_http::{
     compression::CompressionLayer,
     cors::CorsLayer,
@@ -27,6 +28,7 @@ pub fn create_app() -> Router {
     Router::new()
         .route("/", get(|| async { "Hello from Rust on GCP!" }))
         .route("/_health", get(health_check))
+        .route("/peaks", get(get_peaks))
         // request id
         .layer(SetRequestIdLayer::new(
             header::HeaderName::from_static("x-request-id"),
