@@ -1,28 +1,38 @@
-# To test locally, use: docker buildx build --platform linux/arm64 -t peak_backend --load . && docker run -p 8080:8080 peak_backend
-
 # --- Builder stage ---
-FROM rust:slim AS builder
+FROM rust:1.82-slim AS builder
 WORKDIR /usr/src/app
 
 # Install build dependencies
 RUN apt-get update && \
-    apt-get install -y pkg-config build-essential libssl-dev git && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        pkg-config \
+        libssl-dev \
+        git \
+        ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy Cargo files first (for caching)
 COPY Cargo.toml Cargo.lock ./
 
-# Copy source
+# Copy source code
 COPY src ./src
 
-# Build release binary with reproducible builds
-RUN cargo build --release --locked
+# Build release binary
+RUN cargo build --release
 
 # --- Production stage ---
 FROM debian:bookworm-slim
 WORKDIR /app
 
-# Copy the binary from builder stage
+# Install only the runtime OpenSSL library
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libssl3 \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the compiled binary from builder
 COPY --from=builder /usr/src/app/target/release/peak_backend ./peak_backend
 
 # Expose port
